@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Check In | VibeZone</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Bungee', cursive;
+      background-color: #0d0d0d;
+      color: white;
+      text-align: center;
+      padding: 2rem;
+    }
+    input, select, button {
+      font-family: inherit;
+      padding: 0.8rem;
+      margin: 1rem auto;
+      display: block;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 8px;
+      border: none;
+    }
+    button {
+      background: linear-gradient(135deg, #9b30d9, #00cfff);
+      color: white;
+      cursor: pointer;
+    }
+    #qr-code {
+      margin: 2rem auto;
+      width: 200px;
+      height: 200px;
+      background: url('https://api.qrserver.com/v1/create-qr-code/?data=checkin&size=200x200') no-repeat center/cover;
+    }
+    #timer {
+      margin-top: 2rem;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Check In</h1>
+  <label for="purpose">What do you intend to do today?</label>
+  <select id="purpose">
+    <option>Working on a project</option>
+    <option>Group meeting</option>
+    <option>Attending an event</option>
+    <option>Just exploring</option>
+  </select>
+
+  <div id="qr-code"></div>
+
+  <button id="start-btn">Check In</button>
+  <div id="timer">Not checked in</div>
+
+  <script>
+    let startTime;
+    let interval;
+
+    document.getElementById('start-btn').addEventListener('click', () => {
+      startTime = new Date();
+      document.getElementById('timer').textContent = "Session started...";
+      interval = setInterval(() => {
+        const now = new Date();
+        const diff = Math.floor((now - startTime) / 1000);
+        const hours = String(Math.floor(diff / 3600)).padStart(2, '0');
+        const minutes = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+        const seconds = String(diff % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = `Checked in: ${hours}:${minutes}:${seconds}`;
+      }, 1000);
+    });
+  </script>
+</body>
+</html>

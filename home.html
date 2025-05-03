@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VibeZone | Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Bungee', cursive;
+      background-color: #0d0d0d;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+    }
+
+    .home-container {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background-color: #0d0d0d;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+        max-width: 1200px;
+        margin: auto;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .navbar h1 {
+      font-size: 2rem;
+      color: #ffffff;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      font-size: 1rem;
+    }
+
+    .nav-links a {
+      color: #ffffff;
+      text-decoration: none;
+      opacity: 0.8;
+      transition: opacity 0.3s;
+    }
+
+    .nav-links a:hover {
+      opacity: 1;
+    }
+
+    .hero {
+      margin-top: 3rem;
+    }
+
+    .hero h2 {
+      font-size: clamp(2rem, 6vw, 4rem);
+      margin-bottom: 1.5rem;
+      color: #ffffff;
+      text-shadow: 0 0 10px #00cfff, 0 0 20px #9b30d9;
+    }
+
+    .explore-button {
+      padding: 0.8rem 2rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #9b30d9, #00cfff);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(0, 207, 255, 0.4);
+      transition: transform 0.3s ease;
+    }
+
+    .explore-button:hover {
+      transform: scale(1.05);
+    }
+
+    .features {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 4rem;
+    }
+
+    .feature-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 2rem;
+      width: 250px;
+      color: #ffffff;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0, 207, 255, 0.1);
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .feature-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 25px rgba(0, 207, 255, 0.2);
+    }
+
+    .feature-box h3 {
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-box p {
+      font-size: 0.9rem;
+      color: #ccc;
+    }
+
+    .login-button {
+      padding: 0.5rem 1rem;
+      background: linear-gradient(135deg, #9b30d9, #00cfff);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 207, 255, 0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .login-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(0, 207, 255, 0.5);
+    }
+
+    .profile-menu {
+      position: relative;
+      display: inline-block;
+    }
+
+    .profile-pic {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #9b30d9, #00cfff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: #1a1a1a;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .dropdown-content a {
+      color: white;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 0.9rem;
+      transition: background-color 0.3s;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #2a2a2a;
+    }
+
+    .profile-menu:hover .dropdown-content {
+      display: block;
+    }
+
+    .upcoming-events {
+      margin-top: 4rem;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .upcoming-events h2 {
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .event-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .event-card {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+
+    .event-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .event-img {
+      width: 100%;
+      height: 160px;
+      background: linear-gradient(135deg, #440080, #00cfff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2rem;
+    }
+
+    .event-details {
+      padding: 1rem;
+    }
+
+    .event-details h3 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+    }
+
+    .event-date {
+      font-size: 0.85rem;
+      color: #00cfff;
+      margin-bottom: 0.5rem;
+    }
+
+    .event-location {
+      font-size: 0.85rem;
+      color: #ccc;
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .event-location i {
+      margin-right: 0.5rem;
+    }
+
+    .join-btn {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: linear-gradient(135deg, #9b30d9, #00cfff);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .join-btn:hover {
+      transform: scale(1.05);
+    }
+
+    #auth-section {
+      display: none;
+    }
+
+    #guest-section {
+      display: block;
+    }
+
+    .welcome-message {
+      font-size: 1.2rem;
+      color: #00cfff;
+      margin-bottom: 10px;
+      text-shadow: 0 0 5px rgba(0, 207, 255, 0.5);
+    }
+
+    .check-in-btn {
+      padding: 0.6rem 1.5rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ff5e00, #ff003c);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(255, 60, 0, 0.4);
+      transition: all 0.3s ease;
+      margin-top: 15px;
+      margin-bottom: 15px;
+      display: inline-block;
+    }
+
+    .check-in-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(255, 60, 0, 0.6);
+    }
+
+    .check-in-btn:disabled {
+      background: #666;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .check-in-status {
+      font-size: 0.9rem;
+      color: #aaa;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+
+  <div class="home-container">
+    <nav class="navbar">
+      <a href="home.html">
+        <img src="logo.png" alt="VibeZ Logo" style="height: 50px;" />
+      </a>
+    
+      <div style="display: flex; align-items: center; gap: 2rem;">
+        <div class="nav-links">
+          <a href="workspaces.html"><i class="fas fa-briefcase"></i> Workspaces</a>
+          <a href="chill-zones.html"><i class="fas fa-couch"></i> Chill Zones</a>
+          <a href="events.html"><i class="fas fa-calendar-alt"></i> Events</a>
+        </div>
+        
+        <!-- Guest section (shown when not logged in) -->
+        <div id="guest-section">
+          <a href="login.html">
+            <button class="login-button">Register / Log In</button>
+          </a>
+        </div>
+        
+        <!-- Auth section (shown when logged in) -->
+        <div id="auth-section">
+          <div class="profile-menu">
+            <div class="profile-pic" id="profile-pic">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="dropdown-content">
+              <a href="profile.html"><i class="fas fa-user-circle"></i> Profile</a>
+              <a href="bookings.html"><i class="fas fa-ticket-alt"></i> My Bookings</a>
+              <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>      
+
+    <div class="hero">
+      <!-- Welcome message shown when logged in -->
+      <div id="welcome-container" style="display: none;">
+        <p class="welcome-message">Welcome, <span id="user-name">User</span>!</p>
+        <button id="check-in-btn" class="check-in-btn">Check In</button>
+        <p id="check-in-status" class="check-in-status"></p>
+      </div>
+      
+      <h2>Work. Chill. Connect.</h2>
+      <button class="explore-button" id="explore-btn">Explore</button>
+    </div>
+
+    <div class="features">
+      <a href="workspaces.html" class="feature-box">
+        <div>💻</div>
+        <h3>Workspaces</h3>
+        <p>Flexible and modern work areas</p>
+      </a>
+      <a href="chill-zones.html" class="feature-box">
+        <div>🛋️</div>
+        <h3>Chill Zones</h3>
+        <p>Comfortable spaces to relax</p>
+      </a>
+      <a href="events.html" class="feature-box">
+        <div>📅</div>
+        <h3>Events</h3>
+        <p>Workshops, meetups, and more</p>
+      </a>
+    </div>
+
+    <div class="upcoming-events">
+      <h2>Upcoming Events</h2>
+      <div class="event-cards" id="events-container">
+        <!-- Events will be populated by JavaScript -->
+        <div class="event-card">
+          <div class="event-img">🎭</div>
+          <div class="event-details">
+            <h3>Open Mic Night</h3>
+            <div class="event-date"><i class="far fa-calendar"></i> May 15, 2025</div>
+            <div class="event-location"><i class="fas fa-map-marker-alt"></i> Chill Zone Main Hall</div>
+            <button class="join-btn">Join Event</button>
+          </div>
+        </div>
+        <div class="event-card">
+          <div class="event-img">💻</div>
+          <div class="event-details">
+            <h3>Coding Workshop</h3>
+            <div class="event-date"><i class="far fa-calendar"></i> May 20, 2025</div>
+            <div class="event-location"><i class="fas fa-map-marker-alt"></i> Workspace A</div>
+            <button class="join-btn">Join Event</button>
+          </div>
+        </div>
+        <div class="event-card">
+          <div class="event-img">🎵</div>
+          <div class="event-details">
+            <h3>Live DJ Night</h3>
+            <div class="event-date"><i class="far fa-calendar"></i> May 27, 2025</div>
+            <div class="event-location"><i class="fas fa-map-marker-alt"></i> Rooftop Lounge</div>
+            <button class="join-btn">Join Event</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyB_Gx8Reo7Pls-kugk6vCtx58K7F0QnuEU",
+      authDomain: "vibez-58fc7.firebaseapp.com",
+      projectId: "vibez-58fc7",
+      storageBucket: "vibez-58fc7.appspot.com",
+      messagingSenderId: "320272207775",
+      appId: "1:320272207775:web:1e2240a3f07cbd80abb7aa",
+      measurementId: "G-XKWZC5F17V"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Auth and Firestore references
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    // Initialize particles
+    particlesJS("particles-js", {
+      particles: {
+        number: { value: 60, density: { enable: true, value_area: 800 } },
+        color: { value: "#00cfff" },
+        shape: { type: "circle" },
+        opacity: { value: 0.5 },
+        size: { value: 3, random: true },
+        line_linked: {
+          enable: true,
+          distance: 150,
+          color: "#00cfff",
+          opacity: 0.4,
+          width: 1
+        },
+        move: { enable: true, speed: 2, out_mode: "bounce" }
+      },
+      interactivity: {
+        events: {
+          onhover: { enable: true, mode: "grab" },
+          onclick: { enable: true, mode: "push" }
+        },
+        modes: {
+          grab: { distance: 140, line_linked: { opacity: 1 } },
+          push: { particles_nb: 4 }
+        }
+      },
+      retina_detect: true
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get DOM elements
+      const guestSection = document.getElementById('guest-section');
+      const authSection = document.getElementById('auth-section');
+      const welcomeContainer = document.getElementById('welcome-container');
+      const userNameSpan = document.getElementById('user-name');
+      const profilePic = document.getElementById('profile-pic');
+      const checkInBtn = document.getElementById('check-in-btn');
+      const checkInStatus = document.getElementById('check-in-status');
+      
+      // Handle explore button
+      document.getElementById('explore-btn').addEventListener('click', function() {
+        window.location.href = 'workspaces.html';
+      });
+      
+      // Handle logout
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', async function(e) {
+          e.preventDefault();
+          try {
+            await auth.signOut();
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+          } catch (error) {
+            console.error("Logout error:", error);
+          }
+        });
+      }
+      
+      // Handle check-in button
+      if (checkInBtn) {
+        checkInBtn.addEventListener('click', async function() {
+          try {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            // Update last check-in time
+            await db.collection("users").doc(user.uid).update({
+              lastCheckIn: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            // Add to check-in history
+            await db.collection("checkIns").add({
+              userId: user.uid,
+              timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            // Disable check-in button and update status
+            checkInBtn.disabled = true;
+            checkInStatus.textContent = "You've checked in successfully! See you tomorrow.";
+            
+            // Store check-in time in local storage to keep button disabled during the current session
+            localStorage.setItem('lastCheckIn', new Date().toISOString());
+          } catch (error) {
+            console.error("Check-in error:", error);
+            checkInStatus.textContent = "Error checking in. Please try again.";
+          }
+        });
+      }
+
+      // Check auth state
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          // User is signed in
+          guestSection.style.display = 'none';
+          authSection.style.display = 'block';
+          welcomeContainer.style.display = 'block';
+          
+          // Get user data from Firestore
+          db.collection("users").doc(user.uid).get()
+            .then(doc => {
+              if (doc.exists) {
+                const userData = doc.data();
+                
+                // Display user name
+                if (userData.name) {
+                  userNameSpan.textContent = userData.name;
+                } else {
+                  userNameSpan.textContent = user.displayName || "User";
+                }
+                
+                // Check if the user has checked in today
+                const lastCheckIn = userData.lastCheckIn ? new Date(userData.lastCheckIn.toDate()) : null;
+                const now = new Date();
+                
+                if (lastCheckIn && 
+                    lastCheckIn.getDate() === now.getDate() && 
+                    lastCheckIn.getMonth() === now.getMonth() && 
+                    lastCheckIn.getFullYear() === now.getFullYear()) {
+                  // User has already checked in today
+                  checkInBtn.disabled = true;
+                  checkInStatus.textContent = "You've already checked in today!";
+                } else {
+                  // User hasn't checked in today
+                  checkInBtn.disabled = false;
+                  checkInStatus.textContent = "Check in to start your day at VibeZone!";
+                }
+              }
+            })
+            .catch(error => {
+              console.error("Error getting user data:", error);
+            });
+          
+          // Update profile pic with user's initial
+          if (user.displayName) {
+            const initial = user.displayName.charAt(0).toUpperCase();
+            profilePic.innerHTML = initial;
+          }
+        } else {
+          // User is signed out
+          guestSection.style.display = 'block';
+          authSection.style.display = 'none';
+          welcomeContainer.style.display = 'none';
+          
+          // Clear any stored user data
+          localStorage.removeItem('user');
+          localStorage.removeItem('lastCheckIn');
+        }
+      });
+      
+      // Check if user has already checked in this session
+      const lastCheckIn = localStorage.getItem('lastCheckIn');
+      if (lastCheckIn) {
+        const checkInDate = new Date(lastCheckIn);
+        const now = new Date();
+        
+        if (checkInDate.getDate() === now.getDate() && 
+            checkInDate.getMonth() === now.getMonth() && 
+            checkInDate.getFullYear() === now.getFullYear()) {
+          // Disable check-in button if already checked in this session
+          if (checkInBtn) {
+            checkInBtn.disabled = true;
+            checkInStatus.textContent = "You've already checked in today!";
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
