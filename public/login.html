@@ -24,6 +24,7 @@
       width: 100vw;
       height: 100vh;
       z-index: 0;
+      opacity: 0.5;
     }
 
     .login-container {
@@ -183,6 +184,11 @@
       margin-top: 1rem;
     }
   </style>
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <div id="particles-js"></div>
@@ -226,14 +232,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
-  <script type="module">
-    import { 
-      auth, 
-      signInWithGoogle, 
-      saveUserDetails, 
-      redirectBasedOnRole 
-    } from './js/auth.js';
-    
+  <script>
     // Initialize particles
     particlesJS("particles-js", {
       particles: {
@@ -264,6 +263,24 @@
       retina_detect: true
     });
 
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyB_Gx8Reo7Pls-kugk6vCtx58K7F0QnuEU",
+      authDomain: "vibez-58fc7.firebaseapp.com",
+      projectId: "vibez-58fc7",
+      storageBucket: "vibez-58fc7.appspot.com",
+      messagingSenderId: "320272207775",
+      appId: "1:320272207775:web:1e2240a3f07cbd80abb7aa",
+      measurementId: "G-XKWZC5F17V"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Auth and Firestore references
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
     // Get elements from DOM
     const googleBtn = document.getElementById('google-login-btn');
     const userDetailsForm = document.getElementById('user-details-form');
@@ -283,18 +300,51 @@
     });
 
     // Sign in with Google
-    googleBtn.addEventListener('click', async () => {
-      try {
-        const result = await signInWithGoogle();
-        userDetailsForm.style.display = 'block';
-        googleBtn.style.display = 'none';
-      } catch (error) {
-        showError("Login failed: " + error.message);
-      }
+    googleBtn.addEventListener('click', function() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      
+      auth.signInWithPopup(provider)
+        .then((result) => {
+          console.log("Google sign-in successful", result);
+          userDetailsForm.style.display = 'block';
+          googleBtn.style.display = 'none';
+          
+          // Check if user already exists in database
+          checkUserExists(result.user);
+        })
+        .catch((error) => {
+          console.error("Google sign-in error:", error);
+          showError("Login failed: " + error.message);
+        });
     });
 
+    // Check if user exists in database
+    function checkUserExists(user) {
+      db.collection("users").doc(user.uid).get()
+        .then((doc) => {
+          if (doc.exists) {
+            // User exists, redirect based on role
+            const userData = doc.data();
+            if (userData.isAdmin) {
+              window.location.href = "admin/dashboard.html";
+            } else {
+              window.location.href = "home.html";
+            }
+          } else {
+            // New user, continue with form
+            userDetailsForm.style.display = 'block';
+            googleBtn.style.display = 'none';
+          }
+        })
+        .catch((error) => {
+          console.error("Error checking user:", error);
+          showError("Error checking user data: " + error.message);
+        });
+    }
+
     // Complete registration
-    submitBtn.addEventListener('click', async () => {
+    submitBtn.addEventListener('click', function() {
+      const user = auth.currentUser;
       const mobile = mobileInput.value.trim();
       const isAdmin = isAdminCheckbox.checked;
       const adminCode = adminCodeInput.value.trim();
@@ -309,12 +359,35 @@
         return;
       }
       
-      try {
-        await saveUserDetails(mobile, isAdmin);
-        await redirectBasedOnRole();
-      } catch (error) {
-        showError("Error: " + error.message);
-      }
+      // Check if mobile is already registered
+      db.collection("users").where("mobile", "==", mobile).get()
+        .then((querySnapshot) => {
+          if (!querySnapshot.empty) {
+            showError("This mobile number is already registered");
+            return;
+          }
+          
+          // Save user data
+          return db.collection("users").doc(user.uid).set({
+            name: user.displayName,
+            email: user.email,
+            mobile: mobile,
+            isAdmin: isAdmin,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        })
+        .then(() => {
+          console.log("User data saved");
+          if (isAdmin) {
+            window.location.href = "admin/dashboard.html";
+          } else {
+            window.location.href = "home.html";
+          }
+        })
+        .catch((error) => {
+          console.error("Error saving user data:", error);
+          showError("Error saving data: " + error.message);
+        });
     });
 
     // Show error message
@@ -327,13 +400,10 @@
     }
 
     // Check if user is already logged in
-    auth.onAuthStateChanged(async (user) => {
+    auth.onAuthStateChanged((user) => {
       if (user) {
-        // Hide login form elements since user is already logged in
-        googleBtn.style.display = 'none';
-        
-        // Redirect based on role
-        await redirectBasedOnRole();
+        // Check if user exists in database
+        checkUserExists(user);
       }
     });
   </script>
