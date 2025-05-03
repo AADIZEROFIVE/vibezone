@@ -1,45 +1,16 @@
 // auth.js - Authentication functions
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { 
-  getAuth, 
-  GoogleAuthProvider, 
-  signInWithPopup,
-  onAuthStateChanged,
-  signOut 
-} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-  collection,
-  query,
-  where,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+// Firebase SDK is now imported via CDN in the HTML
 
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyB_Gx8Reo7Pls-kugk6vCtx58K7F0QnuEU",
-  authDomain: "vibez-58fc7.firebaseapp.com",
-  projectId: "vibez-58fc7",
-  storageBucket: "vibez-58fc7.appspot.com",
-  messagingSenderId: "320272207775",
-  appId: "1:320272207775:web:1e2240a3f07cbd80abb7aa",
-  measurementId: "G-XKWZC5F17V"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+// Get Firebase instances
+const auth = firebase.auth();
+const db = firebase.firestore();
 
 // Sign in with Google
 async function signInWithGoogle() {
-  const provider = new GoogleAuthProvider();
+  const provider = new firebase.auth.GoogleAuthProvider();
   try {
-    const result = await signInWithPopup(auth, provider);
+    const result = await auth.signInWithPopup(provider);
     return result;
   } catch (error) {
     console.error("Error during sign in:", error);
@@ -53,8 +24,8 @@ async function checkIfAdmin() {
   if (!user) return false;
   
   try {
-    const userDoc = await getDoc(doc(db, "users", user.uid));
-    if (userDoc.exists()) {
+    const userDoc = await db.collection("users").doc(user.uid).get();
+    if (userDoc.exists) {
       return userDoc.data().isAdmin === true;
     }
     return false;
@@ -70,9 +41,9 @@ async function saveUserDetails(mobile, isAdmin = false) {
   if (!user || !mobile) return false;
 
   // Check if mobile is unique
-  const usersRef = collection(db, "users");
-  const q = query(usersRef, where("mobile", "==", mobile));
-  const querySnapshot = await getDocs(q);
+  const usersRef = db.collection("users");
+  const query = usersRef.where("mobile", "==", mobile);
+  const querySnapshot = await query.get();
 
   if (!querySnapshot.empty) {
     throw new Error("Mobile number already registered");
@@ -80,12 +51,12 @@ async function saveUserDetails(mobile, isAdmin = false) {
 
   // Save user data
   try {
-    await setDoc(doc(db, "users", user.uid), {
+    await db.collection("users").doc(user.uid).set({
       name: user.displayName,
       email: user.email,
       mobile: mobile,
       isAdmin: isAdmin,
-      createdAt: new Date()
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     return true;
   } catch (error) {
@@ -97,7 +68,7 @@ async function saveUserDetails(mobile, isAdmin = false) {
 // Sign out user
 async function signOutUser() {
   try {
-    await signOut(auth);
+    await auth.signOut();
     return true;
   } catch (error) {
     console.error("Error signing out:", error);
@@ -107,7 +78,7 @@ async function signOutUser() {
 
 // Auth state observer
 function onAuthStateChange(callback) {
-  return onAuthStateChanged(auth, callback);
+  return auth.onAuthStateChanged(callback);
 }
 
 // Redirect based on user role
@@ -142,8 +113,8 @@ async function getUserProfile() {
   if (!user) return null;
   
   try {
-    const userDoc = await getDoc(doc(db, "users", user.uid));
-    if (userDoc.exists()) {
+    const userDoc = await db.collection("users").doc(user.uid).get();
+    if (userDoc.exists) {
       return {
         id: user.uid,
         ...userDoc.data()
@@ -156,7 +127,8 @@ async function getUserProfile() {
   }
 }
 
-export {
+// Export functions
+window.authFunctions = {
   auth,
   db,
   signInWithGoogle,
