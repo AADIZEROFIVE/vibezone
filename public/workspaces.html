@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workspaces | VibeZone</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Bungee', cursive;
+      background-color: #0d0d0d;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      padding: 0 1rem;
+    }
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background-color: #0d0d0d;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      max-width: 1200px;
+      margin: auto;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      font-size: 1rem;
+    }
+
+    .nav-links a {
+      color: #ffffff;
+      text-decoration: none;
+      opacity: 0.8;
+      transition: opacity 0.3s;
+    }
+
+    .nav-links a:hover {
+      opacity: 1;
+    }
+
+    .login-button {
+      padding: 0.5rem 1rem;
+      background: linear-gradient(135deg, #9b30d9, #00cfff);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 207, 255, 0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .login-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(0, 207, 255, 0.5);
+    }
+
+    .profile-menu {
+      position: relative;
+      display: inline-block;
+    }
+
+    .profile-pic {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #9b30d9, #00cfff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: #1a1a1a;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .dropdown-content a {
+      color: white;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 0.9rem;
+      transition: background-color 0.3s;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #2a2a2a;
+    }
+
+    .profile-menu:hover .dropdown-content {
+      display: block;
+    }
+
+    .page-header {
+      text-align: center;
+      padding: 3rem 2rem 2rem;
+    }
+
+    .page-header h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #9b30d9, #00cfff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .page-header p {
+      max-width: 800px;
+      margin: 0 auto;
+      font-size: 1.1rem;
+      color: #ccc;
+    }
+
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin: 2rem auto;
+      max-width: 1000px;
+      padding: 0 1rem;
+    }
+
+    .filter-dropdown {
+      position: relative;
+      min-width: 200px;
+    }
+
+    .filter-btn {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      color: white;
+      font-size: 0.9rem;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .filter-btn i {
+      font-size: 0.8rem;
+    }
+
+    .filter-dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background-color: #1a1a1a;
+      border-radius: 4px;
+      overflow: hidden;
+      z-index: 10;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .filter-dropdown-content a {
+      color: white;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 0.9rem;
+      transition: background-color 0.3s;
+    }
+
+    .filter-dropdown-content a:hover {
+      background-color: #2a2a2a;
+    }
+
+    .filter-dropdown:hover .filter-dropdown-content {
+      display: block;
+    }
+
+    .search-box {
+      display: flex;
+      min-width: 300px;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 0.8rem 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px 0 0 4px;
+      color: white;
+      font-size: 0.9rem;
+    }
+
+    .search-btn {
+      padding: 0.8rem 1rem;
+      background: linear-gradient(135deg, #9b30d9, #00cfff);
+      color: white;
+      border: none;
+      border-radius: 0 4px 4px 0;
+      cursor: pointer;
+    }
+
+    .workspaces-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto 4rem;
+      padding: 0 1rem;
+    }
+
+    .workspace-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .workspace-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .workspace-image {
+      height: 180px;
+      background: linear-gradient(135deg, #440080, #00cfff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 3rem;
+    }
+
+    .workspace-content {
+      padding: 1.5rem;
+    }
+
+    .workspace-title {
+      font-size: 1.3rem;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+    }
+
+    .workspace-location {
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+      color: #ccc;
+      margin-bottom: 0.5rem;
+    }
+
+    .workspace-location i {
+      margin-right: 0.5rem;
+      font-size: 0.8rem;
+    }
+
+    .workspace-price {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: #00cfff;
+    }
+
+    .workspace-amenities {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .amenity-tag {
+      background: rgba(155, 48, 217, 0.2);
+      color: #ccc;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    .workspace-description {
+      color: #ccc;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .book-btn {
+      width: 100%;
+      padding: 0.8rem;
+      background: linear-gradient(135deg, #9b30d9, #00cfff);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .book-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .availability-badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .available {
+      background-color: rgba(39, 174, 96, 0.8);
+    }
+
+    .booked {
+      background-color: rgba(231, 76, 60, 0.8);
+    }
+
+    footer {
+      background-color: #121212;
+      padding: 3rem 2rem;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .footer-logo {
+      flex: 1;
+      min-width: 200px;
+      text-align: left;
+    }
+
+    .footer-logo img {
+      height: 50px;
+      margin-bottom: 1rem;
+    }
+
+    .footer-logo p {
+      color: #ccc;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .footer-links {
+      flex: 1;
+      min-width: 200px;
+      text-align: left;
+    }
+
+    .footer-links h3 {
+      color: white;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .footer-links ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .footer-links li {
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-links a {
+      color: #ccc;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: #00cfff;
+    }
+
+    .social-icons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .social-icons a {
+      color: white;
+      font-size: 1.5rem;
+      transition: color 0.3s;
+    }
+
+    .social-icons a:hover {
+      color: #00cfff;
+    }
+
+    .copyright {
+      margin-top: 3rem;
+      color: #777;
+      font-size: 0.9rem;
+    }
+
+    #auth-section {
+      display: none;
+    }
+
+    #guest-section {
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .search-box {
+        min-width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+
+  <div class="container">
+    <nav class="navbar">
+      <a href="home.html">
+        <img src="logo.png" alt="VibeZ Logo" style="height: 50px;" />
+      </a>
+    
+      <div style="display: flex; align-items: center; gap: 2rem;">
+        <div class="nav-links">
+          <a href="workspaces.html" class="active"><i class="fas fa-briefcase"></i> Workspaces</a>
+          <a href="chill-zones.html"><i class="fas fa-couch"></i> Chill Zones</a>
+          <a href="events.html"><i class="fas fa-calendar-alt"></i> Events</a>
+        </div>
+        
+        <!-- Guest section (shown when not logged in) -->
+        <div id="guest-section">
+          <a href="login.html">
+            <button class="login-button">Register / Log In</button>
+          </a>
+        </div>
+        
+        <!-- Auth section (shown when logged in) -->
+        <div id="auth-section">
+          <div class="profile-menu">
+            <div class="profile-pic" id="profile-pic">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="dropdown-content">
+              <a href="profile.html"><i class="fas fa-user-circle"></i> Profile</a>
+              <a href="bookings.html"><i class="fas fa-ticket-alt"></i> My Bookings</a>
+              <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="page-header">
+      <h1>Workspaces</h1>
+      <p>Find the perfect workspace for your productivity needs. Whether you need a quiet desk, a meeting room, or a collaborative space, we've got you covered.</p>
+    </div>
+
+    <div class="filter-bar">
+      <div class="filter-dropdown">
+        <button class="filter-btn">
+          <span>Location</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="filter-dropdown-content">
+          <a href="#">All Locations</a>
+          <a href="#">Downtown</a>
+          <a href="#">Uptown</a>
+          <a href="#">East Side</a>
+          <a href="#">West Side</a>
+        </div>
+      </div>
+
+      <div class="filter-dropdown">
+        <button class="filter-btn">
+          <span>Capacity</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="filter-dropdown-content">
+          <a href="#">Any Capacity</a>
+          <a href="#">1-2 People</a>
+          <a href="#">3-5 People</a>
+          <a href="#">6-10 People</a>
+          <a href="#">10+ People</a>
+        </div>
+      </div>
+
+      <div class="filter-dropdown">
+        <button class="filter-btn">
+          <span>Amenities</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="filter-dropdown-content">
+          <a href="#">All Amenities</a>
+          <a href="#">WiFi</a>
+          <a href="#">Projector</a>
+          <a href="#">Whiteboard</a>
+          <a href="#">Coffee</a>
+          <a href="#">Printer</a>
+        </div>
+      </div>
+
+      <div class="search-box">
+        <input type="text" class="search-input" placeholder="Search workspaces...">
+        <button class="search-btn">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="workspaces-grid" id="workspaces-container">
+      <!-- Will be populated by JavaScript -->
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-logo">
+        <img src="logo.png" alt="VibeZone Logo">
+        <p>The ultimate co-working and chill space. Work, relax, and connect with like-minded individuals.</p>
+        <div class="social-icons">
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-linkedin"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-links">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="home.html">Home</a></li>
+          <li><a href="workspaces.html">Workspaces</a></li>
+          <li><a href="chill-zones.html">Chill Zones</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links">
+        <h3>Help & Support</h3>
+        <ul>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Cancellation Policy</a></li>
+          <li><a href="#">Contact Support</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="copyright">
+      &copy; 2025 VibeZone. All rights reserved.
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+  <script type="module">
+    import { auth, onAuthStateChange, signOutUser } from './js/auth.js';
+    
+    // Initialize particles
+    particlesJS("particles-js", {
+      particles: {
+        number: { value: 60, density: { enable: true, value_area: 800 } },
+        color: { value: "#00cfff" },
+        shape: { type: "circle" },
+        opacity: { value: 0.5 },
+        size: { value: 3, random: true },
+        line_linked: {
+          enable: true,
+          distance: 150,
+          color: "#00cfff",
+          opacity: 0.4,
+          width: 1
+        },
+        move: { enable: true, speed: 2, out_mode: "bounce" }
+      },
+      interactivity: {
+        events: {
+          onhover: { enable: true, mode: "grab" },
+          onclick: { enable: true, mode: "push" }
+        },
+        modes: {
+          grab: { distance: 140, line_linked: { opacity: 1 } },
+          push: { particles_nb: 4 }
+        }
+      },
+      retina_detect: true
+    });
+
+    document.addEventListener('DOMContentLoaded', async function() {
+      // Sample workspace data (in a real app, this would come from a database)
+      const workspaces = [
+        {
+          id: 1,
+          name: "Modern Office Space",
+          description: "A sleek, modern office space perfect for focused work or small team meetings. Equipped with high-speed internet and ergonomic furniture.",
+          location: "Downtown, 5th Avenue",
+          capacity: 4,
+          price: 25,
+          amenities: ["WiFi", "Projector", "Whiteboard", "Coffee"],
+          image: "💻"
+        },
+        {
+          id: 2,
+          name: "Creative Studio",
+          description: "Bright and spacious studio designed to inspire creativity. Perfect for designers, artists, and creative teams.",
+          location: "Arts District, Main Street",
+          capacity: 6,
+          price: 30,
+          amenities: ["WiFi", "Whiteboard", "Coffee", "Printer"],
+          image: "🎨"
+        },
+        {
+          id: 3,
+          name: "Conference Room",
+          description: "Professional conference room with state-of-the-art presentation equipment. Ideal for client meetings and presentations.",
+          location: "Business Center, Park Avenue",
+          capacity: 10,
+          price: 45,
+          amenities: ["WiFi", "Projector", "Whiteboard", "Coffee", "Air Conditioning"],
+          image: "📊"
+        },
+        {
+          id: 4,
+          name: "Quiet Focus Pod",
+          description: "Individual pod designed for maximum focus and privacy. Perfect for deep work and virtual meetings.",
+          location: "Tech Hub, Innovation Street",
+          capacity: 1,
+          price: 15,
+          amenities: ["WiFi", "Coffee", "Air Conditioning"],
+          image: "🧠"
+        },
+        {
+          id: 5,
+          name: "Collaborative Space",
+          description: "Open and flexible workspace designed for team collaboration and brainstorming sessions.",
+          location: "Creative Quarter, Collaboration Road",
+          capacity: 8,
+          price: 35,
+          amenities: ["WiFi", "Projector", "Whiteboard", "Coffee", "Printer"],
+          image: "👥"
+        },
+        {
+          id: 6,
+          name: "Garden Workspace",
+          description: "Unique workspace with indoor plants and natural light. A refreshing environment for productivity.",
+          location: "Green Zone, Nature Boulevard",
+          capacity: 4,
+          price: 28,
+          amenities: ["WiFi", "Coffee", "Air Conditioning"],
+          image: "🌿"
+        }
+      ];
+
+      // Display workspaces
+      displayWorkspaces(workspaces);
+      
+      // Handle logout
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', async function(e) {
+          e.preventDefault();
+          try {
+            await signOutUser();
+            window.location.href = 'login.html';
+          } catch (error) {
+            console.error("Logout error:", error);
+          }
+        });
+      }
+
+      // Check auth state
+      onAuthStateChange(user => {
+        const guestSection = document.getElementById('guest-section');
+        const authSection = document.getElementById('auth-section');
+        
+        if (user) {
+          // User is signed in
+          guestSection.style.display = 'none';
+          authSection.style.display = 'block';
+          
+          // Update profile pic with user's initial
+          const profilePic = document.getElementById('profile-pic');
+          if (user.displayName) {
+            const initial = user.displayName.charAt(0).toUpperCase();
+            profilePic.innerHTML = initial;
+          }
+        } else {
+          // User is signed out
+          guestSection.style.display = 'block';
+          authSection.style.display = 'none';
+        }
+      });
+
+      // Function to display workspaces
+      function displayWorkspaces(workspaces) {
+        const container = document.getElementById('workspaces-container');
+        
+        workspaces.forEach(workspace => {
+          const card = document.createElement('div');
+          card.className = 'workspace-card';
+          card.style.position = 'relative';
+          
+          // Generate amenities HTML
+          let amenitiesHtml = '';
+          workspace.amenities.forEach(amenity => {
+            amenitiesHtml += `<span class="amenity-tag">${amenity}</span>`;
+          });
+          
+          card.innerHTML = `
+            <div class="workspace-image">
+              ${workspace.image}
+            </div>
+            <div class="workspace-content">
+              <h2 class="workspace-title">${workspace.name}</h2>
+              <div class="workspace-location">
+                <i class="fas fa-map-marker-alt"></i> ${workspace.location}
+              </div>
+              <div class="workspace-price">${workspace.price}/hour</div>
+              <div class="workspace-amenities">
+                ${amenitiesHtml}
+              </div>
+              <p class="workspace-description">${workspace.description}</p>
+              <button class="book-btn" data-id="${workspace.id}">Book Now</button>
+            </div>
+          `;
+          
+          container.appendChild(card);
+          
+          // Add book button event listener
+          card.querySelector('.book-btn').addEventListener('click', function() {
+            // Check if user is logged in
+            if (!auth.currentUser) {
+              alert('Please log in to book a workspace');
+              window.location.href = 'login.html';
+              return;
+            }
+            
+            // Redirect to booking page with workspace ID
+            window.location.href = `booking.html?type=workspace&id=${workspace.id}`;
+          });
+        });
+      }
+
+      // Implement search functionality
+      const searchInput = document.querySelector('.search-input');
+      const searchBtn = document.querySelector('.search-btn');
+      
+      searchBtn.addEventListener('click', function() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        if (!searchTerm) {
+          displayWorkspaces(workspaces);
+          return;
+        }
+        
+        const filteredWorkspaces = workspaces.filter(workspace => 
+          workspace.name.toLowerCase().includes(searchTerm) ||
+          workspace.description.toLowerCase().includes(searchTerm) ||
+          workspace.location.toLowerCase().includes(searchTerm) ||
+          workspace.amenities.some(amenity => amenity.toLowerCase().includes(searchTerm))
+        );
+        
+        const container = document.getElementById('workspaces-container');
+        container.innerHTML = '';
+        
+        if (filteredWorkspaces.length === 0) {
+          container.innerHTML = '<p>No workspaces found matching your search criteria.</p>';
+        } else {
+          displayWorkspaces(filteredWorkspaces);
+        }
+      });
+      
+      // Search on Enter key press
+      searchInput.addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') {
+          searchBtn.click();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

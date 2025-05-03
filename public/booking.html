@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Bookings | VibeZone</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Bungee', cursive;
+      background-color: #0d0d0d;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      padding: 0 1rem;
+    }
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background-color: #0d0d0d;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      max-width: 1200px;
+      margin: auto;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      font-size: 1rem;
+    }
+
+    .nav-links a {
+      color: #ffffff;
+      text-decoration: none;
+      opacity: 0.8;
+      transition: opacity 0.3s;
+    }
+
+    .nav-links a:hover {
+      opacity: 1;
+    }
+
+    .profile-menu {
+      position: relative;
+      display: inline-block;
+    }
+
+    .profile-pic {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #9b30d9, #00cfff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: #1a1a1a;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .dropdown-content a {
+      color: white;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 0.9rem;
+      transition: background-color 0.3s;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #2a2a2a;
+    }
+
+    .profile-menu:hover .dropdown-content {
+      display: block;
+    }
+
+    .page-header {
+      text-align: center;
+      padding: 3rem 0 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .page-header h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #9b30d9, #00cfff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .page-header p {
+      font-size: 1.1rem;
+      color: #ccc;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .bookings-container {
+      max-width: 1000px;
+      margin: 0 auto 4rem;
+    }
+
+    .booking-tabs {
+      display: flex;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 2rem;
+    }
+
+    .booking-tab {
+      padding: 1rem 2rem;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: all 0.3s ease;
+    }
+
+    .booking-tab:hover {
+      opacity: 1;
+    }
+
+    .booking-tab.active {
+      opacity: 1;
+      border-bottom: 3px solid #9b30d9;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .booking-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .booking-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .booking-header {
+      background: rgba(155, 48, 217, 0.2);
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .booking-id {
+      font-size: 0.9rem;
+      color: #ccc;
+    }
+
+    .booking-type {
+      background: rgba(0, 207, 255, 0.2);
+      color: #00cfff;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    .booking-status {
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .status-confirmed {
+      background-color: rgba(39, 174, 96, 0.2);
+      color: #2ecc71;
+    }
+
+    .status-pending {
+      background-color: rgba(241, 196, 15, 0.2);
+      color: #f1c40f;
+    }
+
+    .status-completed {
+      background-color: rgba(52, 152, 219, 0.2);
+      color: #3498db;
+    }
+
+    .status-cancelled {
+      background-color: rgba(231, 76, 60, 0.2);
+      color: #e74c3c;
+    }
+
+    .booking-body {
+      padding: 1.5rem;
+    }
+
+    .booking-title {
+      font-size: 1.3rem;
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+
+    .booking-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .info-item {
+      color: #ccc;
+    }
+
+    .info-label {
+      font-size: 0.8rem;
+      margin-bottom: 0.3rem;
+      opacity: 0.7;
+    }
+
+    .info-value {
+      font-size: 1rem;
+    }
+
+    .booking-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+    }
+
+    .booking-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .view-btn {
+      background: rgba(0, 207, 255, 0.2);
+      color: #00cfff;
+      border: 1px solid #00cfff;
+    }
+
+    .view-btn:hover {
+      background: rgba(0, 207, 255, 0.3);
+    }
+
+    .reschedule-btn {
+      background: rgba(155, 48, 217, 0.2);
+      color: #9b30d9;
+      border: 1px solid #9b30d9;
+    }
+
+    .reschedule-btn:hover {
+      background: rgba(155, 48, 217, 0.3);
+    }
+
+    .cancel-btn {
+      background: rgba(231, 76, 60, 0.2);
+      color: #e74c3c;
+      border: 1px solid #e74c3c;
+    }
+
+    .cancel-btn:hover {
+      background: rgba(231, 76, 60, 0.3);
+    }
+
+    .review-btn {
+      background: rgba(241, 196, 15, 0.2);
+      color: #f1c40f;
+      border: 1px solid #f1c40f;
+    }
+
+    .review-btn:hover {
+      background: rgba(241, 196, 15, 0.3);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+      color: #444;
+    }
+
+    .empty-state h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+      color: #ccc;
+      margin-bottom: 1.5rem;
+    }
+
+    .browse-btn {
+      padding: 0.8rem 2rem;
+      background: linear-gradient(135deg, #9b30d9, #00cfff);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-block;
+      text-decoration: none;
+    }
+
+    .browse-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 207, 255, 0.3);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      overflow: auto;
+    }
+
+    .modal-content {
+      background-color: #1a1a1a;
+      margin: 5% auto;
+      padding: 2rem;
+      max-width: 500px;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .confirmation-message {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .confirmation-message h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .confirmation-message p {
+      color: #ccc;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .confirm-btn {
+      padding: 0.8rem 2rem;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .confirm-btn:hover {
+      background: #c0392b;
+    }
+
+    .cancel-modal-btn {
+      padding: 0.8rem 2rem;
+      background: transparent;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .cancel-modal-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    footer {
+      background-color: #121212;
+      padding: 3rem 2rem;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .footer-logo {
+      flex: 1;
+      min-width: 200px;
+      text-align: left;
+    }
+
+    .footer-logo img {
+      height: 50px;
+      margin-bottom: 1rem;
+    }
+
+    .footer-logo p {
+      color: #ccc;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .footer-links {
+      flex: 1;
+      min-width: 200px;
+      text-align: left;
+    }
+
+    .footer-links h3 {
+      color: white;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .footer-links ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .footer-links li {
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-links a {
+      color: #ccc;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: #00cfff;
+    }
+
+    .social-icons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .social-icons a {
+      color: white;
+      font-size: 1.5rem;
+      transition: color 0.3s;
+    }
+
+    .social-icons a:hover {
+      color: #00cfff;
+    }
+
+    .copyright {
+      margin-top: 3rem;
+      color: #777;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      .booking-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+      }
+      
+      .booking-tab {
+        white-space: nowrap;
+        padding: 1rem;
+      }
+      
+      .booking-info {
+        grid-template-columns: 1fr;
+      }
+      
+      .booking-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .booking-btn {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+
+  <div class="container">
+    <nav class="navbar">
+      <a href="home.html">
+        <img src="logo.png" alt="VibeZ Logo" style="height: 50px;" />
+      </a>
+    
+      <div style="display: flex; align-items: center; gap: 2rem;">
+        <div class="nav-links">
+          <a href="workspaces.html"><i class="fas fa-briefcase"></i> Workspaces</a>
+          <a href="chill-zones.html"><i class="fas fa-couch"></i> Chill Zones</a>
+          <a href="events.html"><i class="fas fa-calendar-alt"></i> Events</a>
+        </div>
+        
+        <div class="profile-menu">
+          <div class="profile-pic" id="profile-pic">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="dropdown-content">
+            <a href="profile.html"><i class="fas fa-user-circle"></i> Profile</a>
+            <a href="bookings.html"><i class="fas fa-ticket-alt"></i> My Bookings</a>
+            <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="page-header">
+      <h1>My Bookings</h1>
+      <p>Manage all your bookings in one place. View details, reschedule, or cancel your bookings for workspaces, chill zones, and events.</p>
+    </div>
+
+    <div class="bookings-container">
+      <div class="booking-tabs">
+        <div class="booking-tab active" data-tab="upcoming">Upcoming</div>
+        <div class="booking-tab" data-tab="past">Past</div>
+        <div class="booking-tab" data-tab="cancelled">Cancelled</div>
+      </div>
+
+      <div id="upcoming" class="tab-content active">
+        <!-- Upcoming Bookings -->
+        <div class="booking-card">
+          <div class="booking-header">
+            <span class="booking-id">Booking #WS12345</span>
+            <div>
+              <span class="booking-type">Workspace</span>
+              <span class="booking-status status-confirmed">Confirmed</span>
+            </div>
+          </div>
+          <div class="booking-body">
+            <h3 class="booking-title">Modern Office Space</h3>
+            <div class="booking-info">
+              <div class="info-item">
+                <div class="info-label">Date</div>
+                <div class="info-value">May 15, 2025</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Time</div>
+                <div class="info-value">2:00 PM - 5:00 PM</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Location</div>
+                <div class="info-value">Downtown, 5th Avenue</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Guests</div>
+                <div class="info-value">3 People</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Total</div>
+                <div class="info-value">$75.00</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Payment</div>
+                <div class="info-value">Completed</div>
+              </div>
+            </div>
+            <div class="booking-actions">
+              <button class="booking-btn view-btn">
+                <i class="fas fa-eye"></i> View Details
+              </button>
+              <button class="booking-btn reschedule-btn">
+                <i class="fas fa-calendar-alt"></i> Reschedule
+              </button>
+              <button class="booking-btn cancel-btn" data-id="WS12345">
+                <i class="fas fa-times"></i> Cancel Booking
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="booking-card">
+          <div class="booking-header">
+            <span class="booking-id">Booking #EV67890</span>
+            <div>
+              <span class="booking-type">Event</span>
+              <span class="booking-status status-confirmed">Confirmed</span>
+            </div>
+          </div>
+          <div class="booking-body">
+            <h3 class="booking-title">Coding Workshop</h3>
+            <div class="booking-info">
+              <div class="info-item">
+                <div class="info-label">Date</div>
+                <div class="info-value">May 20, 2025</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Time</div>
+                <div class="info-value">6:30 PM - 9:00 PM</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Location</div>
+                <div class="info-value">Workspace A</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Tickets</div>
+                <div class="info-value">1 Ticket</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Total</div>
+                <div class="info-value">$25.00</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Payment</div>
+                <div class="info-value">Completed</div>
+              </div>
+            </div>
+            <div class="booking-actions">
+              <button class="booking-btn view-btn">
+                <i class="fas fa-eye"></i> View Details
+              </button>
+              <button class="booking-btn cancel-btn" data-id="EV67890">
+                <i class="fas fa-times"></i> Cancel Booking
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="booking-card">
+          <div class="booking-header">
+            <span class="booking-id">Booking #CZ54321</span>
+            <div>
+              <span class="booking-type">Chill Zone</span>
+              <span class="booking-status status-confirmed">Confirmed</span>
+            </div>
+          </div>
+          <div class="booking-body">
+            <h3 class="booking-title">Gaming Zone</h3>
+            <div class="booking-info">
+              <div class="info-item">
+                <div class="info-label">Date</div>
+                <div class="info-value">May 18, 2025</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Time</div>
+                <div class="info-value">4:00 PM - 7:00 PM</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Location</div>
+                <div class="info-value">Tech Hub</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Guests</div>
+                <div class="info-value">4 People</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Total</div>
+                <div class="info-value">$60.00</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Payment</div>
+                <div class="info-value">Completed</div>
+              </div>
+            </div>
+            <div class="booking-actions">
+              <button class="booking-btn view-btn">
+                <i class="fas fa-eye"></i> View Details
+              </button>
+              <button class="booking-btn reschedule-btn">
+                <i class="fas fa-calendar-alt"></i> Reschedule
+              </button>
+              <button class="booking-btn cancel-btn" data-id="CZ54321">
+                <i class="fas fa-times"></i> Cancel Booking
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="past" class="tab-content">
+        <!-- Past Bookings -->
+        <div class="booking-card">
+          <div class="booking-header">
+            <span class="booking-id">Booking #WS98765</span>
+            <div>
+              <span class="booking-type">Workspace</span>
+              <span class="booking-status status-completed">Completed</span>
+            </div>
+          </div>
+          <div class="booking-body">
+            <h3 class="booking-title">Conference Room</h3>
+            <div class="booking-info">
+              <div class="info-item">
+                <div class="info-label">Date</div>
+                <div class="info-value">May 5, 2025</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Time</div>
+                <div class="info-value">10:00 AM - 12:00 PM</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Location</div>
+                <div class="info-value">Business Center</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Guests</div>
+                <div class="info-value">5 People</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Total</div>
+                <div class="info-value">$90.00</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Payment</div>
+                <div class="info-value">Completed</div>
+              </div>
+            </div>
+            <div class="booking-actions">
+              <button class="booking-btn view-btn">
+                <i class="fas fa-eye"></i> View Details
+              </button>
+              <button class="booking-btn review-btn">
+                <i class="fas fa-star"></i> Write Review
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="booking-card">
+          <div class="booking-header">
+            <span class="booking-id">Booking #EV23456</span>
+            <div>
+              <span class="booking-type">Event</span>
+              <span class="booking-status status-completed">Completed</span>
+            </div>
+          </div>
+          <div class="booking-body">
+            <h3 class="booking-title">Networking Mixer</h3>
+            <div class="booking-info">
+              <div class="info-item">
+                <div class="info-label">Date</div>
+                <div class="info-value">April 28, 2025</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Time</div>
+                <div class="info-value">6:00 PM - 8:00 PM</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Location</div>
+                <div class="info-value">Social Hub</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Tickets</div>
+                <div class="info-value">1 Ticket</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Total</div>
+                <div class="info-value">Free</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Payment</div>
+                <div class="info-value">N/A</div>
+              </div>
+            </div>
+            <div class="booking-actions">
+              <button class="booking-btn view-btn">
+                <i class="fas fa-eye"></i> View Details
+              </button>
+              <button class="booking-btn review-btn">
+                <i class="fas fa-star"></i> Write Review
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="cancelled" class="tab-content">
+        <!-- Cancelled Bookings -->
+        <div class="empty-state">
+          <i class="fas fa-calendar-times"></i>
+          <h3>No Cancelled Bookings</h3>
+          <p>You don't have any cancelled bookings. Good job!</p>
+          <a href="workspaces.html" class="browse-btn">Browse Workspaces</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cancellation Confirmation Modal -->
+  <div id="cancel-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <div class="confirmation-message">
+        <h3>Confirm Cancellation</h3>
+        <p>Are you sure you want to cancel this booking? This action cannot be undone.</p>
+      </div>
+      <div class="modal-actions">
+        <button id="confirm-cancel" class="confirm-btn">Yes, Cancel</button>
+        <button class="cancel-modal-btn">No, Keep Booking</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-logo">
+        <img src="logo.png" alt="VibeZone Logo">
+        <p>The ultimate co-working and chill space. Work, relax, and connect with like-minded individuals.</p>
+        <div class="social-icons">
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-linkedin"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-links">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="home.html">Home</a></li>
+          <li><a href="workspaces.html">Workspaces</a></li>
+          <li><a href="chill-zones.html">Chill Zones</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links">
+        <h3>Help & Support</h3>
+        <ul>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Cancellation Policy</a></li>
+          <li><a href="#">Contact Support</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="copyright">
+      &copy; 2025 VibeZone. All rights reserved.
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+  <script type="module">
+    import { auth, onAuthStateChange, signOutUser } from './js/auth.js';
+    
+    // Initialize particles
+    particlesJS("particles-js", {
+      particles: {
+        number: { value: 60, density: { enable: true, value_area: 800 } },
+        color: { value: "#00cfff" },
+        shape: { type: "circle" },
+        opacity: { value: 0.5 },
+        size: { value: 3, random: true },
+        line_linked: {
+          enable: true,
+          distance: 150,
+          color: "#00cfff",
+          opacity: 0.4,
+          width: 1
+        },
+        move: { enable: true, speed: 2, out_mode: "bounce" }
+      },
+      interactivity: {
+        events: {
+          onhover: { enable: true, mode: "grab" },
+          onclick: { enable: true, mode: "push" }
+        },
+        modes: {
+          grab: { distance: 140, line_linked: { opacity: 1 } },
+          push: { particles_nb: 4 }
+        }
+      },
+      retina_detect: true
+    });
+
+    document.addEventListener('DOMContentLoaded', async function() {
+      // Check if user is logged in
+      if (!auth.currentUser) {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      // Update profile pic in navbar
+      const profilePic = document.getElementById('profile-pic');
+      if (auth.currentUser.displayName) {
+        const initial = auth.currentUser.displayName.charAt(0).toUpperCase();
+        profilePic.textContent = initial;
+      }
+      
+      // Handle logout
+      const logoutBtn = document.getElementById('logout-btn');
+      logoutBtn.addEventListener('click', async function(e) {
+        e.preventDefault();
+        try {
+          await signOutUser();
+          window.location.href = 'login.html';
+        } catch (error) {
+          console.error("Logout error:", error);
+        }
+      });
+      
+      // Tab navigation
+      const tabs = document.querySelectorAll('.booking-tab');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          // Remove active class from all tabs
+          tabs.forEach(t => t.classList.remove('active'));
+          // Add active class to clicked tab
+          this.classList.add('active');
+          
+          // Hide all tab content
+          document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+          });
+          
+          // Show corresponding tab content
+          const tabId = this.getAttribute('data-tab');
+          document.getElementById(tabId).classList.add('active');
+        });
+      });
+      
+      // Cancellation modal
+      const modal = document.getElementById('cancel-modal');
+      const cancelBtns = document.querySelectorAll('.cancel-btn');
+      const closeBtn = document.querySelector('.close-btn');
+      const cancelModalBtn = document.querySelector('.cancel-modal-btn');
+      const confirmCancelBtn = document.getElementById('confirm-cancel');
+      
+      let bookingIdToCancel = null;
+      
+      // Open modal when cancel button is clicked
+      cancelBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          bookingIdToCancel = this.getAttribute('data-id');
+          modal.style.display = 'block';
+        });
+      });
+      
+      // Close modal when close button is clicked
+      closeBtn.addEventListener('click', function() {
+        modal.style.display = 'none';
+      });
+      
+      // Close modal when "No, Keep Booking" button is clicked
+      cancelModalBtn.addEventListener('click', function() {
+        modal.style.display = 'none';
+      });
+      
+      // Close modal when clicking outside
+      window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+      
+      // Handle booking cancellation
+      confirmCancelBtn.addEventListener('click', function() {
+        // In a real app, you would make an API call to cancel the booking
+        console.log('Cancelling booking:', bookingIdToCancel);
+        
+        // For demo purposes, we'll just remove the booking card from the DOM
+        // and add it to the cancelled tab
+        const bookingCard = document.querySelector(`.cancel-btn[data-id="${bookingIdToCancel}"]`).closest('.booking-card');
+        
+        if (bookingCard) {
+          // Update status badge
+          const statusBadge = bookingCard.querySelector('.booking-status');
+          statusBadge.className = 'booking-status status-cancelled';
+          statusBadge.textContent = 'Cancelled';
+          
+          // Remove cancel button
+          const cancelBtn = bookingCard.querySelector('.cancel-btn');
+          cancelBtn.remove();
+          
+          // If reschedule button exists, remove it
+          const rescheduleBtn = bookingCard.querySelector('.reschedule-btn');
+          if (rescheduleBtn) {
+            rescheduleBtn.remove();
+          }
+          
+          // Move booking card to cancelled tab
+          bookingCard.remove();
+          document.getElementById('cancelled').innerHTML = '';
+          document.getElementById('cancelled').appendChild(bookingCard);
+        }
+        
+        // Close modal
+        modal.style.display = 'none';
+        
+        // If cancelled tab is now empty, show empty state
+        if (document.getElementById('cancelled').children.length === 0) {
+          document.getElementById('cancelled').innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-calendar-times"></i>
+              <h3>No Cancelled Bookings</h3>
+              <p>You don't have any cancelled bookings. Good job!</p>
+              <a href="workspaces.html" class="browse-btn">Browse Workspaces</a>
+            </div>
+          `;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
